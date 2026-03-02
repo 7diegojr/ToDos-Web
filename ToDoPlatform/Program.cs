@@ -1,9 +1,39 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using ToDoPlatform.Data;
+using ToDoPlatform.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+// Serviço de conexão com o Banco de Dados
+string conexao = builder.Configuration.GetConnectionString("Conexao");
+builder.Services.AddDbContext<AppDbContext>(
+    options => options.UseMySQL(conexao)
+);
+
+// Serviço de configuração do Identity - Gestão de Usuários
+builder.Services.AddIdentity<AppUser, IdentityRole>(
+    opt =>
+    {
+        opt.User.RequireUniqueEmail = true; // Não deixa repetir email
+        opt.SignIn.RequireConfirmedAccount = false; // Não precisa confirmar o email para usar
+        // Pode configurar opções de senha, etc
+    } 
+)
+.AddEntityFrameworkStores<AppDbContext>() // Onde e como guardar os dados
+.AddDefaultTokenProviders(); // Geração automática de tokens
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+
+// Garante a existência do Banco
+using (var scope = app.Services.CreateScope())
+{
+    var DbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await DbContext.Database.EnsureCreatedAsync();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -16,6 +46,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
