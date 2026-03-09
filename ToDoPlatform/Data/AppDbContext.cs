@@ -20,6 +20,8 @@ public class AppDbContext : IdentityDbContext<AppUser>
         // Renomeando as tabelas do banco
         base.OnModelCreating(builder);
 
+        AppDbSeed appDbSeed = new(builder);
+
         #region Configuração das Tabelas do Identity
         builder.Entity<AppUser>().ToTable("users");
         builder.Entity<IdentityRole>().ToTable("roles");
@@ -31,5 +33,4 @@ public class AppDbContext : IdentityDbContext<AppUser>
         #endregion
 
     }
-
 }
