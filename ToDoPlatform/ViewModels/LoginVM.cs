@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ToDoPlatform.ViewModels;
 
@@ -10,7 +11,13 @@ public class LoginVM
     public string Email { get; set; }
 
     [DataType(DataType.Password)]
+    [Display(Name = "Senha", Prompt = "********")]
+    [Required(ErrorMessage = "A senha de acesso é obrigatória!")]
     public string Password { get; set; }
-    public bool RememberMe { get; set; }
+    
+    [Display(Name = "Manter conectado?")]
+    public bool RememberMe { get; set; } = false;
+
+    [HiddenInput]
     public string ReturnUrl { get; set; } // Guarda o caminho da página que o usuário estava para devolver ele lá
 }
