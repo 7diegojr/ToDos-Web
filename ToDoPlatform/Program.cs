@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ToDoPlatform.Data;
 using ToDoPlatform.Models;
+using ToDoPlatform.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,8 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(
 .AddDefaultTokenProviders(); // Geração automática de tokens
 
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddTransient<IUserService, UserService>();
 
 var app = builder.Build();
 
