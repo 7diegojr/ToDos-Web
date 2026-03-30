@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ToDoPlatform.ViewModels;
 
-public class LoginVM
+//ViewModels: transporta dados entre a View e o Controller(moldadas conforme a necessidade de cada tela)
+
+public class LoginVM // dados do formulário de login
 {
     [Display(Name = "E-mail", Prompt = "seu@email.com")]
     [Required(ErrorMessage = "O e-mail de acesso é obrigatório")]
@@ -18,6 +20,6 @@ public class LoginVM
     [Display(Name = "Manter conectado?")]
     public bool RememberMe { get; set; } = false;
 
-    [HiddenInput]
-    public string ReturnUrl { get; set; } // Guarda o caminho da página que o usuário estava para devolver ele lá
+    [HiddenInput] // armazena para qual página o usuário deve ser redirecionado após o login
+    public string ReturnUrl { get; set; }
 }

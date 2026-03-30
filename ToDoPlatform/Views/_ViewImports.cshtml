@@ -1,3 +1,6 @@
-﻿@using ToDoPlatform
-@using ToDoPlatform.Models
+﻿@using ToDoPlatform   @*importam os namespaces principais do projeto*@
+@using ToDoPlatform.Models   @*importam os namespaces principais do projeto*@
+@using ToDoPlatform.ViewModels   @* todas as Views poderão usar @model LoginVM, @modelHomeVM etc. *@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@* habilita os Tag Helpers do ASP.NET Core MVC globalmente
+(asp-for, asp-action, asp-controller e asp-validation-for)*@

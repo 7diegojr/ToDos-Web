@@ -1,57 +1,33 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
-using ToDoPlatform.Helpers;
+using ToDoPlatform.Data;
 using ToDoPlatform.Models;
-using ToDoPlatform.ViewModels;
 
 namespace ToDoPlatform.Services;
 
-public class UserService : IUserService
+public class UserService
 {
-    private readonly SignInManager<AppUser> _signInManager;
-    private readonly UserManager<AppUser> _userManager;
-    private readonly ILogger<UserService> _logger;
+    // readonly: garante que o campo só pode ser atribuído no construtor.
+    private readonly SignInManager<AppUser> _signInManager; // Login/Logout
+    private readonly UserManager<AppUser> _userManagaer; // Gerencia de users e roles
+    private readonly ILogger<UserService> _logger; // Sistema de logs
+    private readonly AppDbContext _dbContext; // Acesso direto ao banco
+    private readonly IHttpContextAccessor _httpContextAccessor; // Acessa a requisição HTTP atual
 
+    // O ASP.NET lê este construtor e injeta automaticamente tudo que estiver
+    // registrado no DI Container (injeção de dependências)
     public UserService(
+        AppDbContext dbContext,
+        IHttpContextAccessor httpContextAccessor,
         SignInManager<AppUser> signInManager,
         UserManager<AppUser> userManager,
         ILogger<UserService> logger
     )
     {
+        // Cada parâmetro é atribuído ao campo privado correspondente
+        _dbContext = dbContext;
+        _httpContextAccessor = httpContextAccessor;
         _signInManager = signInManager;
-        _userManager = userManager;
+        _userManagaer = userManager;
         _logger = logger;
-    }
-
-    public async Task<SignInResult> Login(LoginVM login)
-    {
-        string userName = login.Email;
-
-        if (Helper.IsValidEmail(login.Email))
-        {
-            var user = await _userManager.FindByEmailAsync(login.Email);
-            if (user != null)
-                userName = user.UserName;
-        }
-
-        var result = await _signInManager.PasswordSignInAsync(
-            userName, login.Password, login.RememberMe,
-            lockoutOnFailure: true
-        );
-
-        if (result.Succeeded)
-            _logger.LogInformation($"Usuário '{userName}' acessou o sistema");
-        if (result.IsLockedOut)
-            _logger.LogWarning($"O usuário '{userName}' está bloqueado");
-        if (result.IsNotAllowed)
-            _logger.LogWarning($"O usuário '{userName}' está tentando acessar uma área restrita");
-            
-        return result;
-    }
-
-    public async Task Logout()
-    {
-        _logger.LogInformation($"Usuário '{ClaimTypes.Email}' saiu do sistema.");
-        await _signInManager.SignOutAsync();
     }
 }
