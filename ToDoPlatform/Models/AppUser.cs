@@ -10,5 +10,5 @@ public class AppUser : IdentityUser
     public string Name { get; set; }
 
     [StringLength(300)]
-    public int ProfilePicture { get; set; }
+    public string ProfilePicture { get; set; }
 }

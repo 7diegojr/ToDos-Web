@@ -20,14 +20,16 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(
         opt.User.RequireUniqueEmail = true; // Não deixa repetir email
         opt.SignIn.RequireConfirmedAccount = false; // Não precisa confirmar o email para usar
         // Pode configurar opções de senha, etc
-    } 
+    }
 )
 .AddEntityFrameworkStores<AppDbContext>() // Onde e como guardar os dados
 .AddDefaultTokenProviders(); // Geração automática de tokens
 
-builder.Services.AddControllersWithViews();
-
+// Registro do serviço de usuário
+// AddTransient(1 dos 3 tipos): uma nova instância do UserService será criada a cada vez que ele for solicitado
 builder.Services.AddTransient<IUserService, UserService>();
+
+builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
