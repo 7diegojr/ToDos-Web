@@ -1,51 +1,120 @@
+@* Define o Model desta View — só aceita um objeto LoginVM *@
+@model LoginVM
 @{
-    Layout = null;
+    Layout = null;  @* esta página NÃO usa o _Layout.cshtml padrão *@
 }
-
 
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <!-- Responsividade -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ToDos Platform - Login</title>
     <link rel="stylesheet" href="~/css/login.css">
 </head>
+
 <body>
     <div class="login-container">
         <div class="login-card">
+            
             <div class="logo">ToDos Platform</div>
             <h1 class="form-title">Bem-vindo de volta!</h1>
-            
-            <div class="error-message" id="errorMessage">
-                Email ou senha inválidos
-            </div>
 
-            <form id="loginForm">
+            <form id="loginForm" asp-action="Login">
+                @* Campo oculto — não aparece na tela mas é enviado junto com o formulário *@
+                <input asp-for="ReturnUrl">
+
                 <div class="form-group">
-                    <label class="form-label" for="email">Email</label>
-                    <input type="email" id="email" class="form-input" placeholder="seu@email.com" required>
+                    @* texto definido em [Display(Name="...")] no ViewModel *@
+                    <label class="form-label" asp-for="Email"></label>
+
+                    @* asp-for no input gera: id="Email" name="Email" type="email" *@
+                    @* O type é inferido automaticamente pelo tipo da propriedade no ViewModel *@
+                    <input class="form-input" asp-for="Email">
+
+                    @* Exibe a mensagem de erro de validação do campo Email caso tenha *@
+                    <span class="error-message" asp-validation-for="Email"></span>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="password">Senha</label>
-                    <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+                    <label class="form-label" asp-for="Password"></label>
+
+                    @* Como Password é do tipo [DataType(DataType.Password)] no ViewModel *@
+                    @* asp-for gera automaticamente type="password" (oculta os caracteres) *@
+                    <input class="form-input" asp-for="Password">
+
+                    <span class="error-message" asp-validation-for="Password"></span>
                 </div>
 
                 <div class="remember-forgot">
                     <label class="remember">
-                        <input type="checkbox"> Lembrar-me
+                        @* Checkbox vinculado à propriedade bool do ViewModel *@
+                        <input type="checkbox" asp-for="RememberMe">
+
+                        @* Label clicável vinculado ao checkbox *@
+                        <label class="form-label" asp-for="RememberMe"></label>
                     </label>
-                    <a href="#" class="forgot-password">Esqueceu a senha?</a>
+
+                    @* Link ainda sem funcionalidade — será implementado futuramente *@
+                    <a href="#" class="forgot-password">
+                        Esqueceu a senha?
+                    </a>
                 </div>
 
-                <button type="submit" class="btn-login">Entrar</button>
-                
+                @* Se TempData["Success"] não for null (login bem-sucedido) → desabilita o botão *@
+                @* (Evita que o usuário clique novamente enquanto o redirecionamento acontece) *@
+                <button 
+                    type="submit" 
+                    class="btn-login"
+                    disabled="@(TempData["Success"] != null)">
+                    Entrar
+                </button>
+
                 <div class="register-link">
-                    Não tem uma conta? <a href="registro.html">Cadastre-se</a>
+                    Não tem uma conta? 
+                    @* asp-action="Register" → gera href="/Account/Register" automaticamente *@
+                    <a asp-action="Register">Cadastre-se</a>
                 </div>
             </form>
+
         </div>
     </div>
+
+    @* jQuery — necessário para o sistema de validação client-side funcionar *@
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    @* Inclui os scripts de validação do lado do cliente (jquery.validate) *@
+    @* Valida o formulário no navegador ANTES de enviar para o servidor *@
+    <partial name="_ValidationScriptsPartial" />
+
+    @* Inclui a Partial View de notificações (SweetAlert2) *@
+    @* Contém a função showMessage() que será chamada logo abaixo *@
+    <partial name="_Notification" />
+
+    <script>
+        @* TempData["Success"] é injetado pelo Razor em tempo de servidor *@
+        @* O resultado vira uma string JavaScript antes de chegar ao navegador *@
+
+        @* Verifica se existe mensagem de sucesso *@
+        if ('@TempData["Success"]' !== "") {
+            showMessage(
+                null,               // type null → usa "success" como padrão (definido na função)
+                '@TempData["Success"]', // texto da mensagem vindo do Controller
+                3000,               // fecha após 3 segundos
+                document.getElementById('ReturnUrl').value // redireciona para a URL de retorno
+            );
+        }
+
+        @* Verifica se existe mensagem de falha *@
+        if ('@TempData["Failure"]' !== "") {
+            showMessage(
+                "warning",          // ícone de aviso
+                '@TempData["Failure"]', // texto do erro vindo do Controller
+                5000,               // fica mais tempo (5s) pois é um erro — usuário precisa ler
+                null                // sem redirecionamento em caso de erro
+            );
+        }
+    </script>
 </body>
 </html>

@@ -1,0 +1,51 @@
+<!-- Carrega o SweetAlert2 direto da internet via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Função assíncrona reutilizável — pode ser chamada de qualquer View
+    // Parâmetros:
+    //   type → ícone do alerta: "success", "error", "warning", "info"
+    //   text → mensagem exibida ao usuário
+    //   time → duração em milissegundos antes de fechar automaticamente
+    //   url  → (opcional) redireciona para essa URL após o alerta fechar
+    async function showMessage(type, text, time, url) {
+
+    // Controla se o timer chegou ao fim naturalmente
+    // false = ainda não fechou, true = fechou sozinho
+    let timerCompleted = false;
+
+    const result = await Swal.mixin({
+
+    toast: true,           // notificação pequena, não bloqueia a tela
+    position: "top-end",   // canto superior direito
+    showConfirmButton: false, // Oculta o botão "OK" (fecha sozinho pelo timer)
+    timer: time,           // Tempo em ms até fechar
+    timerProgressBar: true, // Exibe uma barrinha de progresso do timer embaixo do toast
+    
+    // didOpen → executado assim que o toast aparece na tela
+    didOpen: (toast) => {
+
+        // Se o mouse entrar no toast → pausa o timer
+        toast.onmouseenter = () => Swal.stopTimer();
+        // Se o mouse sair do toast → retoma o timer
+        toast.onmouseleave = () => Swal.resumeTimer();
+        // Sobrescreve o onmouseleave acima
+        toast.onmouseleave = () => { timerCompleted = false; };
+    },
+
+    // willClose → executado ANTES de o toast fechar
+    // Marca que o timer completou (usado para decidir se redireciona)
+    willClose: () => { timerCompleted = true; }
+    }).fire({
+        icon: type ?? "success", // Ícone
+        title: text              // Texto principal da notificação
+    });
+
+    // Após o toast fechar, verifica se deve redirecionar
+    // Só redireciona se:
+    //   1. O timer fechou naturalmente (timerCompleted = true)
+    //   2. Uma URL foi passada como parâmetro
+    if (timerCompleted && url) {
+        window.location.href = url; // Redireciona o navegador para a URL informada
+    }
+    }
+</script>

@@ -4,16 +4,15 @@ using ToDoPlatform.ViewModels;
 
 namespace Vereda_Cafeteria.Controllers;
 
-[Route("[controller]")]
 // gerencia todas as ações relacionadas à conta do usuário
-public class ContaController : Controller // dá acesso a View(), RedirectToAction(), TempData, ModelState, etc.
+public class AccountController : Controller // dá acesso a View(), RedirectToAction(), TempData, ModelState, etc.
 {
     // Dependências injetadas — readonly: só podem ser atribuídas no construtor
-    private readonly ILogger<ContaController> _logger; // Registro e logs
+    private readonly ILogger<AccountController> _logger; // Registro e logs
     private readonly IUserService _userService; // Lógica de login/logout
 
     // Construtor — o ASP.NET injeta automaticamente via DI Container
-    public ContaController(ILogger<ContaController> logger, IUserService userService)
+    public AccountController(ILogger<AccountController> logger, IUserService userService)
     {
         _logger = logger;
         _userService = userService;
@@ -82,7 +81,7 @@ public class ContaController : Controller // dá acesso a View(), RedirectToActi
 
         // Após deslogar, redireciona para a tela de login
         // RedirectToAction("Action", "Controller") — sem o sufixo "Controller"
-        return RedirectToAction("Login", "Conta");
+        return RedirectToAction("Login", "Account");
     }
 
     // Ações ainda sem implementação — retornam apenas a View correspondente
