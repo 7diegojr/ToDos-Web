@@ -1,0 +1,38 @@
+@* permite injetar diretamente um serviço em uma View,
+sem precisar passá-lo pelo Controller *@
+@* IUserService injetado para buscar os dados do usuário logado*@
+@inject ToDoPlatform.Services.IUserService userService
+@{
+    @* Chama o serviço GetLoggedUser() *@
+    @*objeto UserVM com nome, foto e roles do usuário*@
+    var user = await userService.GetLoggedUser();
+}
+
+@* se não houver usuário logado, nada é renderizado*@
+@if (user != null)
+{
+    <div class="user-menu" id="userMenu">
+        <div class="user-info">
+            <div class="user-avatar">
+                @* Se a foto do usuário não estiver definida, será usada uma imagem padrão.*@
+                <img src="@(user.ProfilePicture ??
+                     Url.Content("~/img/users/default.png"))" width="100%" />
+            </div>
+            <span class="user-name">@user.Name</span>
+        </div>
+        <div class="dropdown" id="dropdown">
+            <a href="#" class="dropdown-item"><span>👤</span> Perfil</a>
+            <a href="#" class="dropdown-item"><span>⚙️</span>
+                Configurações</a>
+                @* geram a URL correta para o formulário de logout
+                apontando para a action Logout do AccountController *@
+            <form asp-action="Logout" asp-controller="Account" method="post">
+                @* insere o token CSRF no formulário de logout *@
+                @Html.AntiForgeryToken()
+                <button type="submit" class="dropdown-item" style="width: 100%;">
+                    <span>🚪</span> Sair
+                </button>
+            </form>
+        </div>
+    </div>
+}
